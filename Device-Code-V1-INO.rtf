@@ -1,0 +1,137 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red0\green175\blue0;\red128\green128\blue128;\red207\green207\blue0;
+\red0\green0\blue207;\red0\green175\blue175;\red207\green0\blue207;}
+{\*\expandedcolortbl;;\csgenericrgb\c0\c68627\c0;\csgenericrgb\c50196\c50196\c50196;\csgenericrgb\c81176\c81176\c0;
+\csgenericrgb\c0\c0\c81176;\csgenericrgb\c0\c68627\c68627;\csgenericrgb\c81176\c0\c81176;}
+\margl1440\margr1440\vieww14360\viewh12060\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 /**********************************************************************************\
+ *  Driving Bot v1\
+ **********************************************************************************/\cf3 \
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf4 #include <SPI.h>\
+#include <Wire.h>\
+#include <Adafruit_GFX.h>\
+#include <Adafruit_SSD1306.h>\
+\pard\pardeftab720\partightenfactor0
+\cf3 \
+\pard\pardeftab720\partightenfactor0
+\cf4 #define SCREEN_WIDTH 128 \cf2 // OLED display width, in pixels\
+\cf4 #define SCREEN_HEIGHT 32 \cf2 // OLED display height, in pixels\
+\pard\pardeftab720\partightenfactor0
+\cf3 \
+\cf2 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)\
+\pard\pardeftab720\partightenfactor0
+\cf4 #define OLED_RESET     4 \cf2 // Reset pin # (or -1 if sharing Arduino reset pin)\
+\pard\pardeftab720\partightenfactor0
+\cf0 Adafruit_SSD1306\cf3  \cf0 display(SCREEN_WIDTH,\cf3  \cf0 SCREEN_HEIGHT,\cf3  \cf0 &Wire,\cf3  \cf0 OLED_RESET);\cf3 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 // define pins numbers\
+\pard\pardeftab720\partightenfactor0
+\cf5 const\cf3  \cf5 int\cf3  \cf0 trigPin\cf3  \cf0 =\cf3  \cf6 9\cf0 ;\cf3 \
+\cf5 const\cf3  \cf5 int\cf3  \cf0 echoPin\cf3  \cf0 =\cf3  \cf6 10\cf0 ;\cf3 \
+\cf5 const\cf3  \cf5 int\cf3  \cf0 greenLedPin\cf3  \cf0 =\cf3  \cf6 13\cf0 ;\cf3 \
+\cf5 const\cf3  \cf5 int\cf3  \cf0 buzzerPin\cf3  \cf0 =\cf3  \cf6 12\cf0 ;\cf3 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 // define Trigger Distance in CM\
+\pard\pardeftab720\partightenfactor0
+\cf5 const\cf3  \cf5 int\cf3  \cf0 trigDistance\cf3  \cf0 =\cf3  \cf6 200\cf0 ;\cf3  \cf2 //change this value from 2 to 400\
+\pard\pardeftab720\partightenfactor0
+\cf3 \
+\cf2 // define variables\
+\pard\pardeftab720\partightenfactor0
+\cf5 long\cf3  \cf0 duration;\cf3 \
+\cf5 int\cf3  \cf0 distance;\cf3 \
+\pard\pardeftab720\partightenfactor0
+\cf0 uint32_t\cf3  \cf0 delayMS;\cf3 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 void\cf3  \cf0 setup()\cf3  \cf0 \{\cf3 \
+  \cf0 pinMode(trigPin,\cf3  \cf0 OUTPUT);\cf3  \cf2 // Sets the trigPin as an Output\
+\pard\pardeftab720\partightenfactor0
+\cf3   \cf0 pinMode(echoPin,\cf3  \cf0 INPUT);\cf3  \cf2 // Sets the echoPin as an Input\
+\cf3   \cf0 pinMode(buzzerPin,\cf3  \cf0 OUTPUT);\cf3  \cf2 // Sets the greenLedPin as an Output\
+\cf3   \cf0 pinMode(greenLedPin,\cf3  \cf0 OUTPUT);\cf3  \cf2 // Sets the redLedPin as an Output\
+\cf3   \cf0 Serial.begin(\cf6 9600\cf0 );\cf3  \cf2 // Starts the serial communication\
+\cf3   \cf2 // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally\
+\cf3   \cf0 display.begin(SSD1306_SWITCHCAPVCC,\cf3  \cf6 0x3C\cf0 );\cf3   \cf2 // initialize with the I2C addr 0x3D (for the 128x64)\
+\cf3   \cf2 // init done\
+\cf3   \cf0 display.setTextSize(\cf6 1\cf0 );\cf3 \
+  \cf0 display.setTextColor(WHITE);\cf3 \
+  \cf0 display.clearDisplay();\cf3  \cf2 // Clear display buffer\
+\cf3   \cf0 delayMS\cf3  \cf0 =\cf3  \cf6 1000\cf0 ;\cf3 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \}\cf3 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 void\cf3  \cf0 ledOnOff(\cf5 int\cf3  \cf0 distance)\{\cf3 \
+  \cf5 if\cf0 (distance\cf3  \cf0 <\cf3  \cf0 trigDistance)\{\cf3 \
+    \cf0 digitalWrite(greenLedPin,\cf3  \cf0 LOW);\cf3    \cf2 // turn the GREEN LED off\
+\pard\pardeftab720\partightenfactor0
+\cf3     \cf0 digitalWrite(buzzerPin,\cf3  \cf0 HIGH);\cf3    \cf2 // turn the RED LED on\
+\cf3     \cf0 delay(\cf6 100\cf0 );\cf3 \
+    \cf0 digitalWrite(buzzerPin,\cf3  \cf0 LOW);\cf3    \cf2 // turn the RED LED off\
+\cf3     \cf0 delay(\cf6 100\cf0 );\cf3 \
+    \cf0 digitalWrite(buzzerPin,\cf3  \cf0 HIGH);\cf3    \cf2 // turn the RED LED on\
+\cf3   \cf0 \}\cf3 \
+  \cf5 else\cf0 \{\cf3 \
+    \cf0 digitalWrite(greenLedPin,\cf3  \cf0 HIGH);\cf3    \cf2 // turn the GREEN LED on\
+\cf3     \cf0 digitalWrite(buzzerPin,\cf3  \cf0 LOW);\cf3    \cf2 // turn the RED LED off\
+\cf3   \cf0 \}\cf3 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \}\cf3 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 void\cf3  \cf0 loop()\cf3  \cf0 \{\cf3 \
+  \cf2 // Clears the trigPin\
+\pard\pardeftab720\partightenfactor0
+\cf3   \cf0 digitalWrite(trigPin,\cf3  \cf0 LOW);\cf3 \
+  \cf0 delayMicroseconds(\cf6 2\cf0 );\cf3 \
+  \cf2 // Sets the trigPin on HIGH state for 10 micro seconds\
+\cf3   \cf0 digitalWrite(trigPin,\cf3  \cf0 HIGH);\cf3 \
+  \cf0 delayMicroseconds(\cf6 10\cf0 );\cf3 \
+  \cf0 digitalWrite(trigPin,\cf3  \cf0 LOW);\cf3 \
+  \cf2 // Reads the echoPin, returns the sound wave travel time in microseconds\
+\cf3   \cf0 duration\cf3  \cf0 =\cf3  \cf0 pulseIn(echoPin,\cf3  \cf0 HIGH);\cf3 \
+  \cf2 // Calculating the distance\
+\cf3   \cf0 distance=\cf3  \cf0 duration*\cf6 0.034\cf0 /\cf6 2\cf0 ;\cf3 \
+  \cf2 // Prints the distance on the Serial Monitor\
+\cf3   \cf0 Serial.print(\cf7 "Distance: "\cf0 );\cf3 \
+  \cf0 Serial.println(distance);\cf3 \
+\
+  \cf5 if\cf3  \cf0 (distance\cf3  \cf0 <\cf3  \cf0 trigDistance)\{\cf3 \
+      \cf0 ledOnOff(distance);\cf3 \
+      \cf0 display.setTextSize(\cf6 1\cf0 );\cf3 \
+      \cf0 display.setCursor(\cf6 1\cf0 ,\cf6 1\cf0 );\cf3 \
+      \cf0 display.print(\cf7 "STAY BACK!"\cf0 );\cf3  \
+      \cf0 display.println();\cf3 \
+      \cf0 display.setTextSize(\cf6 2\cf0 );\cf3 \
+      \cf0 display.setCursor(\cf6 15\cf0 ,\cf6 15\cf0 );\cf3   \
+      \cf0 display.print(distance);\cf3      \
+      \cf0 display.display();\cf3 \
+      \cf0 delay(delayMS);\cf3 \
+      \cf0 display.clearDisplay();\cf3 \
+  \cf0 \}\cf3 \
+  \cf5 else\cf0 \{\cf3 \
+      \cf0 ledOnOff(distance);\cf3 \
+      \cf0 display.setTextSize(\cf6 1\cf0 );\cf3 \
+      \cf0 display.setCursor(\cf6 1\cf0 ,\cf6 1\cf0 );\cf3 \
+      \cf0 display.print(\cf7 "Distance:"\cf0 );\cf3  \
+      \cf0 display.println();\cf3 \
+      \cf0 display.setTextSize(\cf6 2\cf0 );\cf3 \
+      \cf0 display.setCursor(\cf6 15\cf0 ,\cf6 15\cf0 );\cf3   \
+      \cf0 display.print(distance);\cf3      \
+      \cf0 display.display();\cf3 \
+      \cf0 delay(delayMS);\cf3 \
+      \cf0 display.clearDisplay();\cf3 \
+  \cf0 \}\cf3 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \}\cf3 \
+}
